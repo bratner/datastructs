@@ -21,39 +21,79 @@ struct digit * new_head(){
 	return tmp;
 }
 
-void add_digit(struct dlist * list, char num ){
+int add_digit(struct dlist * list, unsigned char num ){
 	struct digit * tmp;
 	tmp = list->head;
-	if(tmp)
-	   while(tmp->next)
-		tmp++;
-	
+	if(tmp){
+		while(tmp->next)
+			tmp = tmp->next;
+		
+		if((tmp->next = malloc(sizeof(struct digit))) == NULL)
+			return 0;
+		tmp = tmp->next;
+		
+	}else{
+		if((list->head = malloc(sizeof(struct digit))) == NULL)
+			return 0;
+		tmp = list->head;
+		
+	}
+	tmp->next = NULL;
+	tmp->digit = num;
+	return 1;
 }
 
 struct dlist * num2list(long long num){
 	struct dlist * ret;
-	char i,j;
-        ret = malloc(sizeof(dlist));
+	unsigned char i;
+        ret = malloc(sizeof(struct dlist));
+	ret->head = NULL;
 	if (!ret)
 		return NULL;
 	if ( num < 0 ) {
-		ret.sign = -1;
+		ret->sign = -1;
+		num *= -1;
 	}else{	
-		ret.sign = 1;
+		ret->sign = 1;
 	}
-	if( ! (ret->head = new_head() ) )
-		return NULL;
+	//if(!(ret->head = new_head()))
+	//	return NULL;
 	
 
 	while(num){
 		i = num % 10;
 		num /= 10;
-		add_digit(ret, i);
+		if(!add_digit(ret, i))
+			return NULL;
 	}
+	return ret;
 	
 };
+
+void print_digits(struct digit * digit){
+	
+	if (!digit ){
+		return;		
+	}else{
+		print_digits(digit->next);		
+	}
+	printf("%d",digit->digit);
+}
+void print_list(struct dlist * list){
+	if(!list){
+		return;
+	}else if(list->sign == -1){
+		printf("-");	      
+	}
+	print_digits(list->head);
+}
+
 int main(int argc, char * argv[]){
 	// free stuff
+	struct dlist * test;
 	printf("%ld\n", sizeof(long long));
+	test = num2list(1234567890);
+	if(test)
+	    print_list(test);
 	return 0;
 }
